@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Apex | Home</title>
+
+  <link rel="stylesheet" href="home.css" />
+  <script src="home.js" defer></script>
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <!-- Logo placeholder -->
+      <div class="logo-box"></div>
+      <h1 class="site-name">Apex</h1>
+    </div>
+
+    <nav class="nav-links">
+      <a href="home.html" class="nav-link active">Home</a>
+      <a href="courses.html" class="nav-link">Courses</a>
+      <a href="network.html" class="nav-link">Network</a>
+      <a href="mypath.html" class="nav-link">My Path</a>
+    </nav>
+
+    <div class="header-right">
+      <!-- User avatar placeholder -->
+      <div class="user-avatar"></div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-badge">
+        ✨ AI-Powered Career Navigation
+      </div>
+
+      <h2 class="hero-title">Your path to the top starts here</h2>
+
+      <p class="hero-subtitle">
+        Tell us your dream job and our AI maps out the courses, skills, and tools to get you there
+      </p>
+
+      <div class="search-box">
+        <input
+          type="text"
+          id="dreamJobInput"
+          placeholder="What's your dream job? e.g. Software Engineer, UX Designer"
+        />
+        <button id="findPathButton">Find my path →</button>
+      </div>
+
+      <div class="quick-tags" id="quickTagsContainer">
+        <!-- Tags will be rendered by JavaScript -->
+      </div>
+    </section>
+
+    <!-- Platform Stats -->
+    <section class="content-section">
+      <h3 class="section-title">Platform stats</h3>
+
+      <div class="stats-grid" id="statsContainer">
+        <!-- Stats cards will be rendered by JavaScript -->
+      </div>
+    </section>
+
+    <!-- Trending Career Paths -->
+    <section class="content-section">
+      <div class="section-header">
+        <h3 class="section-title">Trending career paths</h3>
+        <a href="courses.html" class="view-all-link">View all →</a>
+      </div>
+
+      <div class="career-grid" id="careerPathsContainer">
+        <!-- Career cards will be rendered by JavaScript -->
+      </div>
+    </section>
+
+    <!-- Recent Activity -->
+    <section class="content-section">
+      <h3 class="section-title">Recent activity</h3>
+
+      <div class="activity-list" id="activityContainer">
+        <!-- Activity items will be rendered by JavaScript -->
+      </div>
+    </section>
+  </main>
+</body>
+</html>
