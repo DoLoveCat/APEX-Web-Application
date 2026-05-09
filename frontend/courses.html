@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Apex | Courses</title>
+
+  <link rel="stylesheet" href="courses.css" />
+  <script src="courses.js" defer></script>
+</head>
+
+<body>
+  <!-- Header / Navigation -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo-box">A</div>
+      <h1 class="site-name">Apex</h1>
+    </div>
+
+    <nav class="nav-links">
+      <a href="home.html" class="nav-link">Home</a>
+      <a href="courses.html" class="nav-link active">Courses</a>
+      <a href="network.html" class="nav-link">Network</a>
+      <a href="mypath.html" class="nav-link">My Path</a>
+    </nav>
+
+    <div class="header-right">
+      <div class="user-avatar">LN</div>
+    </div>
+  </header>
+
+  <main class="courses-main">
+    <!-- Course List Page -->
+    <section id="courseListPage" class="course-list-page">
+      <section class="page-intro">
+        <h2>Browse courses</h2>
+        <p>Search the full UCR catalog · Read peer reviews · Plan your path</p>
+      </section>
+
+      <!-- Search and Sort Toolbar -->
+      <section class="toolbar">
+        <div class="search-input-wrapper">
+          <span class="search-icon">🔍</span>
+          <input
+            id="courseSearchInput"
+            type="text"
+            placeholder="Search by course name, code, or professor..."
+          />
+        </div>
+
+        <select id="sortSelect" class="sort-select">
+          <option value="careerRelevance">Sort: Career Relevance</option>
+          <option value="ratingHighToLow">Sort: Rating High to Low</option>
+          <option value="difficultyLowToHigh">Sort: Difficulty Low to High</option>
+          <option value="mostReviews">Sort: Most Reviews</option>
+          <option value="courseCode">Sort: Course Code</option>
+        </select>
+
+        <select id="ratingSelect" class="sort-select">
+          <option value="0">Min rating: Any</option>
+          <option value="4.0">Min rating: 4.0+</option>
+          <option value="4.3">Min rating: 4.3+</option>
+          <option value="4.5">Min rating: 4.5+</option>
+        </select>
+      </section>
+
+      <!-- Tag Filter -->
+      <section class="tag-filter-section">
+        <div id="categoryFilterContainer" class="category-filter-container">
+          <!-- Category filter buttons are rendered by JavaScript -->
+        </div>
+      </section>
+
+      <section class="course-result-header">
+        <p id="courseResultText">Showing courses</p>
+      </section>
+
+      <!-- Course Cards -->
+      <section id="courseCardContainer" class="course-card-container">
+        <!-- Course cards are rendered by JavaScript -->
+      </section>
+
+      <section id="emptyState" class="empty-state hidden">
+        <h3>No courses found</h3>
+        <p>Try another search keyword or category filter.</p>
+      </section>
+    </section>
+
+    <!-- Course Detail Page -->
+    <section id="courseDetailPage" class="course-detail-page hidden">
+      <button id="backToCoursesButton" class="back-button">
+        ← Back to courses
+      </button>
+
+      <section class="course-detail-header">
+        <p id="detailCourseMeta" class="detail-course-meta"></p>
+        <h2 id="detailCourseTitle"></h2>
+
+        <div class="detail-summary-row">
+          <span id="detailCourseRating"></span>
+          <span id="detailCourseReviews"></span>
+          <span id="detailCourseProfessor"></span>
+        </div>
+      </section>
+
+      <section class="detail-stats-grid">
+        <article class="detail-stat-card">
+          <p class="detail-stat-label">Career Relevance</p>
+          <p id="detailCareerRelevance" class="detail-stat-value"></p>
+        </article>
+
+        <article class="detail-stat-card">
+          <p class="detail-stat-label">Difficulty</p>
+          <p id="detailDifficulty" class="detail-stat-value"></p>
+        </article>
+
+        <article class="detail-stat-card">
+          <p class="detail-stat-label">Professor</p>
+          <p id="detailProfessorRating" class="detail-stat-value"></p>
+        </article>
+      </section>
+
+      <section class="course-description-section">
+        <h3>Course overview</h3>
+        <p id="detailCourseDescription"></p>
+      </section>
+
+      <section class="recent-review-section">
+        <h3>Recent reviews</h3>
+
+        <div id="reviewContainer" class="review-container">
+          <!-- Reviews are rendered by JavaScript -->
+        </div>
+      </section>
+
+      <button class="write-review-button">
+        Write a review
+      </button>
+    </section>
+  </main>
+</body>
+</html>
