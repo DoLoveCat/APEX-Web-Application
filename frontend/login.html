@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Apex | Log In</title>
+
+  <link rel="stylesheet" href="login.css" />
+  <!-- defer = wait until HTML is parsed before running JS, so getElementById finds the form -->
+  <script src="login.js" defer></script>
+</head>
+<body>
+  <main class="login-container">
+    <a href="home.html" class="brand-logo" aria-label="Apex home">
+      <img src="picture/apex_logo.png" alt="Apex" />
+    </a>
+    <h1>Welcome back</h1>
+
+    <!-- novalidate disables the browser's built-in error popups so we control all error UI from JS -->
+    <form id="login-form" novalidate>
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" required autocomplete="email" />
+
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" required autocomplete="current-password" />
+
+      <button type="submit" id="submit-btn">Log in</button>
+
+      <!-- Hidden by default; login.js fills + unhides it when the server returns an error -->
+      <p id="error-message" class="error" role="alert" hidden></p>
+    </form>
+
+    <p>Don't have an account? <a href="signup.html">Sign up</a></p>
+  </main>
+</body>
+</html>
