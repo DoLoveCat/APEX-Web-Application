@@ -41,17 +41,19 @@ body {
   align-items: center;
 }
 
-.logo-box {
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  background-color: var(--primary-color);
-  margin-right: 12px;
+.brand-link {
+  display: inline-flex;
+  align-items: center;
+  height: 60px;
+  overflow: hidden;
+  text-decoration: none;
 }
 
-.site-name {
-  font-size: 22px;
-  font-weight: 700;
+.brand-logo-img {
+  height: 110px;
+  width: auto;
+  display: block;
+  object-position: top;
 }
 
 .nav-links {
