@@ -46,9 +46,9 @@ body {
 }
 
 .logo-box {
-  width: 34px;
-  height: 34px;
-  margin-right: 12px;
+  width: 40px;
+  height: 40px;
+  margin-right: 14px;
 
   display: flex;
   align-items: center;
@@ -57,7 +57,8 @@ body {
   border-radius: 10px;
   background-color: var(--primary-color);
   color: white;
-  font-weight: 700;
+
+  font-weight: 800;
 }
 
 .site-name {
