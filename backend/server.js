@@ -17,6 +17,8 @@ app.use(express.json());
 
 // Any request that starts with /api/auth/... should go to the auth routes file
 app.use('/api/auth', authRoutes);
+app.use('/api/users', require('./routes/users.routes'));
+// add users.routes here to handle user profile related routes like /api/users/me
 
 // Routes
 app.get('/', (req, res) => {
@@ -36,3 +38,4 @@ app.get('/health', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
