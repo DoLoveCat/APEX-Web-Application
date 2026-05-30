@@ -1,41 +1,56 @@
-const express = require('express');
-const cors = require('cors');
-require('dotenv').config();
-const connectDB = require('./config/db');
-const mongoose = require('mongoose');
-const authRoutes = require('./routes/auth.routes');
+const express = require("express");
+const cors = require("cors");
+const dotenv = require("dotenv");
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
+const cookieParser = require('cookie-parser');
 
-// Connect to MongoDB
+const connectDB = require("./config/db");
+
+const passport = require('passport');
+require("./config/passport");
+
+dotenv.config();
+
 connectDB();
 
-// Middleware
-app.use(cors());
+const app = express();
+
+app.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+}));
+
 app.use(express.json());
+app.use(cookieParser());
 
-// Any request that starts with /api/auth/... should go to the auth routes file
-app.use('/api/auth', authRoutes);
-app.use('/api/users', require('./routes/users.routes'));
-// add users.routes here to handle user profile related routes like /api/users/me
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET || "secretKey",
+        resave: false,
+        saveUninitialized: false,
 
-// Routes
-app.get('/', (req, res) => {
-  res.send('Hello from Apex backend!!!!');
-});
+        store: MongoStore.create({
+            mongoUrl: process.env.MONGO_URI
+        }),
 
-app.get('/health', (req, res) => {
-  const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
-  res.json({
-    status: 'ok',
-    server: 'running',
-    database: dbStatus,
-    timestamp: new Date()
-  });
-});
+        cookie: {
+            maxAge: 1000 * 60 * 60 * 24,
+            httpOnly: true,
+            secure: false
+        }
+    })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use("/api/courses", require("./routes/courseRoutes"));
+app.use("/api/auth", require("./routes/authRoutes"));
+
+const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
-
