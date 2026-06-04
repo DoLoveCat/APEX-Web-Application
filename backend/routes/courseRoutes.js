@@ -2,14 +2,20 @@ const express = require("express");
 
 const router = express.Router();
 
+const authMiddleware = require("../middleware/authMiddleware");
+
 const {
     getCourses,
     getCourseById,
-    searchCourses
+    keywordSearchCourses,
+    semanticSearch,
+    generateEmbedding
 } = require("../controllers/courseController");
 
-router.get("/", getCourses);
-router.get("/:id", getCourseById);
-router.get("/search", searchCourses);
+router.get("/", authMiddleware, getCourses);
+router.get("/search", authMiddleware, keywordSearchCourses);
+router.get("/embed", authMiddleware, generateEmbedding);
+router.post("/semantic", authMiddleware, semanticSearch);
+router.get("/:id", authMiddleware, getCourseById);
 
 module.exports = router;
