@@ -20,3 +20,5 @@ cd backend && npm install
 add JWT_SECRET=<anything> to your .env 
 npm run dev — should see "MongoDB connected"
 open signup.html with Live Server to verify auth works locally
+
+//////

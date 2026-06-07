@@ -12,12 +12,19 @@ const PORT = process.env.PORT || 3000;
 connectDB();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true
+}));
 app.use(express.json());
 
 // Any request that starts with /api/auth/... should go to the auth routes file
 app.use('/api/auth', authRoutes);
 app.use('/api/users', require('./routes/users.routes'));
+app.use('/api/courses', require('./routes/courseRoutes'));
+app.use('/api/chat', require('./routes/chat.routes'));
+app.use('/api/friends', require('./routes/friend.routes'));
+
 // add users.routes here to handle user profile related routes like /api/users/me
 
 // Routes

@@ -4,6 +4,7 @@ from requests import request
 from requests.cookies import RequestsCookieJar
 from bs4 import BeautifulSoup
 import json
+import os
 
 def get_session(term):
     JSESSIONID = requests.get("https://registrationssb.ucr.edu").cookies["JSESSIONID"]
@@ -96,7 +97,7 @@ def parse_html(html):
     soup = BeautifulSoup(html, "html.parser")
     return soup.get_text(separator=" ", strip=True)
 
-def run(term="202630"):
+def run(term="202640"):
 
     headers, jar = get_session(term)
     totalCount = get_total_count(term, headers, jar)
@@ -129,10 +130,24 @@ def run(term="202630"):
 
         time.sleep(0.5)
 
+    if os.path.exists("courses.json"):
+        with open("courses.json", "r", encoding="utf-8") as f:
+            existingCourses = json.load(f)
+    else:
+        existingCourses = []
 
-    with open("courses.json", "w", encoding="utf-8") as f: json.dump(cleanCourses, f, indent=2)
+    combined = existingCourses + cleanCourses
+    uniqueCombined = deduplicate(combined)
+
+    uniqueCoursesSorted = sorted(
+        uniqueCombined.values(),
+        key=lambda c: (c.get("subject", ""), c.get("courseNumber", ""))
+    )
+    
+    with open("courses.json", "w", encoding="utf-8") as f: json.dump(uniqueCoursesSorted, f, indent=2)
 
     print("Saved courses.json")
+    print(f"Total unique courses: {len(uniqueCombined)}")
 
 if __name__ == "__main__":
-    run(term="202630")
+    run(term="202640")
