@@ -1,10 +1,17 @@
 const Course = require("../models/Course");
 
-const { VoyageAIClient } = require("voyageai");
-const voyage = new VoyageAIClient({ apiKey: process.env.VOYAGE_API_KEY });
+// The Voyage / Groq SDKs are only needed for the AI-powered semantic search
+// (the /embed endpoint). They're loaded lazily so a missing package or API key
+// doesn't prevent the server from booting or break plain course browsing.
+function getVoyage() {
+    const { VoyageAIClient } = require("voyageai");
+    return new VoyageAIClient({ apiKey: process.env.VOYAGE_API_KEY });
+}
 
-const Groq = require("groq-sdk");
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+function getGroq() {
+    const Groq = require("groq-sdk");
+    return new Groq({ apiKey: process.env.GROQ_API_KEY });
+}
 
 function cosineSimilarity(a, b) {
     const dot = a.reduce((sum, val, i) => sum + val * b[i], 0);
@@ -19,7 +26,7 @@ async function getCourses(req, res) {
 }
 
 async function getCourseById(req, res) {
-    const course = await Course.findById(req.params.id);
+    const course = await Course.findById(req.params.id).select("-embedding -rawDescription");
     res.json(course);
 }
 
@@ -44,6 +51,7 @@ async function keywordSearchCourses(req, res) {
 }
 
 async function expandQuery(q) {
+    const groq = getGroq();
     const response = await groq.chat.completions.create({
         model: "llama-3.1-8b-instant",
         max_tokens: 100,
@@ -63,6 +71,7 @@ async function generateEmbedding(req, res) {
         const expandedQuery = await expandQuery(q);
         console.log("Expanded query:", expandedQuery);
 
+        const voyage = getVoyage();
         const result = await voyage.embed({
             input: [expandedQuery],
             model: "voyage-3"
@@ -91,6 +100,8 @@ async function semanticSearch(req, res) {
             courseNumber: course.courseNumber,
             title: course.title,
             description: course.description,
+            term: course.term,
+            crn: course.crn,
             score: cosineSimilarity(queryEmbedding, course.embedding)
         }));
 

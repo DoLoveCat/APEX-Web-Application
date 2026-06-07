@@ -8,7 +8,7 @@ export default function Login({setUser}) {
 
     async function loginUser() {
         const response = await fetch(
-            "http://localhost:5000/api/auth/login",
+            "http://localhost:5001/api/auth/login",
             {
                 method: "POST",
                 headers: {
@@ -27,15 +27,14 @@ export default function Login({setUser}) {
         console.log("Login response:", data);
 
         if (response.ok) {
+            localStorage.setItem('token', data.token);
             setUser(data.user);
             navigate("/");
-        } else {
-            alert(data.message);
         }
     }
 
     function loginWithGoogle() {
-        window.location.href = "http://localhost:5000/api/auth/google";
+        window.location.href = "http://localhost:5001/api/auth/google";
     }
 
     return (

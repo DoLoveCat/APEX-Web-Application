@@ -2,7 +2,7 @@ const express = require("express");
 
 const router = express.Router();
 
-const authMiddleware = require("../middleware/authMiddleware");
+const { requireAuth } = require("../middleware/auth.middleware");
 
 const {
     getCourses,
@@ -12,10 +12,10 @@ const {
     generateEmbedding
 } = require("../controllers/courseController");
 
-router.get("/", authMiddleware, getCourses);
-router.get("/search", authMiddleware, keywordSearchCourses);
-router.get("/embed", authMiddleware, generateEmbedding);
-router.post("/semantic", authMiddleware, semanticSearch);
-router.get("/:id", authMiddleware, getCourseById);
+router.get("/", requireAuth, getCourses);
+router.get("/search", requireAuth, keywordSearchCourses);
+router.get("/embed", requireAuth, generateEmbedding);
+router.post("/semantic", requireAuth, semanticSearch);
+router.get("/:id", requireAuth, getCourseById);
 
 module.exports = router;

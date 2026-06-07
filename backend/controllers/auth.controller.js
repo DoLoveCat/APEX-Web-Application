@@ -24,9 +24,9 @@ exports.signup = async (req, res) => {
     }
 
     // 2. Make sure role is one of the allowed values
-    if (!['student', 'mentor'].includes(role)) {
+    if (!['student'].includes(role)) {
       return res.status(400).json({
-        error: 'Role must be either student or mentor'
+        error: 'Role must be student'
       });
     }
 

@@ -2,55 +2,69 @@ import { useState } from "react";
 
 function CourseForm ({
     API_URL,
-    setCourses
+    setCourses,
+    setLoading,
+    setCareerGoal,
+    initialGoal
 }) {
-    const [searchTerm, setSearchTerm] = useState("");
+    const [searchTerm, setSearchTerm] = useState(initialGoal || "");
 
     async function handleSearch(event) {
         event.preventDefault();
 
-        const embedResponse = await fetch(`${API_URL}/embed?q=${searchTerm}`, {
-        credentials: "include"
-        });
+        if (!searchTerm.trim()) return;
 
-        const { embedding } = await embedResponse.json();
+        setLoading(true);
+        setCareerGoal(searchTerm);
 
-        // const response = await fetch (`${API_URL}/semantic?q=${searchTerm}`, {
-        // credentials: "include"  // add this
-        // });
+        const authHeader = {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+        };
 
-        // 2. Use embedding for both at the same time
-        const [response] = await Promise.all([
-            fetch(`${API_URL}/semantic`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify({ embedding })
-            }),
-            fetch("http://localhost:5000/api/users/career-goal", {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify({ careerGoal: searchTerm, embedding })
-            })
-        ]);
+        try {
+            const embedResponse = await fetch(`${API_URL}/embed?q=${encodeURIComponent(searchTerm)}`, {
+                headers: authHeader
+            });
 
-        const data = await response.json();
-        console.log("Data received:", data);
-        setCourses(data);
+            const { embedding } = await embedResponse.json();
+
+            // 2. Use embedding for both at the same time
+            const [response] = await Promise.all([
+                fetch(`${API_URL}/semantic`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", ...authHeader },
+                    body: JSON.stringify({ embedding })
+                }),
+                fetch("http://localhost:5001/api/users/career-goal", {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json", ...authHeader },
+                    body: JSON.stringify({ careerGoal: searchTerm, embedding })
+                })
+            ]);
+
+            const data = await response.json();
+            console.log("Data received:", data);
+            setCourses(Array.isArray(data) ? data : []);
+        } catch (error) {
+            console.error("Search failed:", error);
+            setCourses([]);
+        } finally {
+            setLoading(false);
+        }
     }
 
     return (
-        <form onSubmit={handleSearch}>
+        <form className="search-form" onSubmit={handleSearch}>
 
             <input
+                className="search-input"
                 type="text"
-                placeholder="Search for courses"
+                placeholder="Enter your career goal (e.g. software engineer)"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
             />
 
-            <button type="submit"> Search </button>
+            <button className="btn-primary" type="submit"> Get Recommendations </button>
 
         </form>
     );

@@ -9,23 +9,27 @@ export default function Register() {
 
     async function registerUser() {
         const response = await fetch(
-        "http://localhost:5000/api/auth/register",
+        "http://localhost:5001/api/auth/signup",
         {
-            method: "POST",
-            headers: {
-            "Content-Type": "application/json"
-            },
-            credentials: "include",
-
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
                 body: JSON.stringify({
                     name,
                     email,
-                    password
+                    password,
+                    role: "student"
                 })
             }
         );
 
         const data = await response.json();
+
+        if (!response.ok) {
+            alert(data.error || "Registration failed");
+            return;
+        }
 
         alert(data.message);
         navigate("/login");
@@ -66,6 +70,16 @@ export default function Register() {
             >
                 Register
             </button>
+
+            <p>
+                Already have an account?{" "}
+                <button
+                    type="button"
+                    onClick={() => navigate("/login")}
+                >
+                    Log in
+                </button>
+            </p>
         </div>
     );
 }
