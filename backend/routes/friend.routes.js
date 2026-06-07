@@ -9,6 +9,9 @@ router.use(requireAuth);
 // Find users to add
 router.get('/search', friendController.searchUsers);
 
+// Suggested friends (similar career goals)
+router.get('/recommendations', friendController.getRecommendations);
+
 // Requests
 router.post('/request', friendController.sendRequest);
 router.get('/requests', friendController.getIncomingRequests);

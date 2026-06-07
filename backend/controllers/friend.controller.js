@@ -3,6 +3,16 @@ const FriendRequest = require('../models/FriendRequest');
 
 const USER_FIELDS = 'name email careerGoal';
 
+// Measures how similar two career-goal embeddings are (1 = identical direction,
+// 0 = unrelated). Returns 0 for empty/zero vectors to avoid NaN.
+function cosineSimilarity(a, b) {
+  const dot = a.reduce((sum, val, i) => sum + val * b[i], 0);
+  const magA = Math.sqrt(a.reduce((sum, val) => sum + val * val, 0));
+  const magB = Math.sqrt(b.reduce((sum, val) => sum + val * val, 0));
+  if (magA === 0 || magB === 0) return 0;
+  return dot / (magA * magB);
+}
+
 // GET /api/friends/search?q=...  -> find users by name (to add)
 exports.searchUsers = async (req, res) => {
   try {
@@ -121,6 +131,51 @@ exports.declineRequest = async (req, res) => {
   } catch (error) {
     console.error('Decline request error:', error);
     res.status(500).json({ error: 'Server error declining request' });
+  }
+};
+
+// GET /api/friends/recommendations  -> users with the most similar career goals
+exports.getRecommendations = async (req, res) => {
+  try {
+    const queryEmbedding = req.user.careerEmbedding;
+    // No career goal set yet -> nothing to compare against
+    if (!queryEmbedding || queryEmbedding.length === 0) return res.json([]);
+
+    // Anyone with a pending request in either direction shouldn't be suggested
+    const pending = await FriendRequest.find({
+      status: 'pending',
+      $or: [{ from: req.user._id }, { to: req.user._id }]
+    }).select('from to');
+
+    // Exclude: myself + existing friends + pending requests
+    const excludeIds = new Set([
+      req.user._id.toString(),
+      ...req.user.friends.map((id) => id.toString()),
+      ...pending.flatMap((r) => [r.from.toString(), r.to.toString()])
+    ]);
+
+    // Candidate pool: other users who have a career embedding
+    const candidates = await User.find({
+      _id: { $nin: [...excludeIds] },
+      careerEmbedding: { $exists: true, $ne: [] }
+    }).select('name email careerGoal careerEmbedding');
+
+    // Score by career similarity, sort high-to-low, return the top 5
+    const recommendations = candidates
+      .map((user) => ({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        careerGoal: user.careerGoal,
+        score: cosineSimilarity(queryEmbedding, user.careerEmbedding)
+      }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 5);
+
+    res.json(recommendations);
+  } catch (error) {
+    console.error('Get recommendations error:', error);
+    res.status(500).json({ error: 'Server error fetching recommendations' });
   }
 };
 

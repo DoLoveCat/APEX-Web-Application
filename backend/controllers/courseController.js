@@ -105,10 +105,10 @@ async function semanticSearch(req, res) {
             score: cosineSimilarity(queryEmbedding, course.embedding)
         }));
 
-        // 4. Return top 6
+        // 4. Return the top matches (client decides how many to show: 5/10/15)
         const top = scored
             .sort((a, b) => b.score - a.score)
-            .slice(0, 6);
+            .slice(0, 20);
 
         res.json(top);
     } catch (error) {

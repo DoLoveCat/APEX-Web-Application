@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
+
+import { useToast } from "../context/ToastContext";
 
 const API = "http://localhost:5001/api/friends";
 
@@ -10,7 +13,17 @@ function authHeader(json) {
     return headers;
 }
 
+function initials(name) {
+    return (name || "?")
+        .trim()
+        .split(/\s+/)
+        .slice(0, 2)
+        .map((part) => part[0]?.toUpperCase() || "")
+        .join("");
+}
+
 function UserList() {
+    const toast = useToast();
     const [query, setQuery] = useState("");
     const [results, setResults] = useState([]);
     const [searched, setSearched] = useState(false);
@@ -43,8 +56,9 @@ function UserList() {
             const data = await res.json();
             if (res.ok) {
                 setSent((prev) => [...prev, id]);
+                toast("Friend request sent", "success");
             } else {
-                alert(data.error || "Could not send request");
+                toast(data.error || "Could not send request");
             }
         } catch (error) {
             console.error("Failed to send request:", error);
@@ -67,20 +81,43 @@ function UserList() {
                 </button>
             </form>
 
-            {searched && results.length === 0 && <p>No users found.</p>}
+            {searched && results.length === 0 && (
+                <p className="muted">No users found.</p>
+            )}
 
-            {results.map((user) => (
-                <div key={user._id} className="user-card">
-                    <h3>{user.name}{user.careerGoal ? ` - ${user.careerGoal}` : ""}</h3>
-                    <p>{user.email}</p>
-                    <button
-                        onClick={() => sendRequest(user._id)}
-                        disabled={sent.includes(user._id)}
-                    >
-                        {sent.includes(user._id) ? "Sent" : "Connect"}
-                    </button>
+            {results.length > 0 && (
+                <div className="friend-list">
+                    {results.map((user) => (
+                        <div key={user._id} className="friend-card">
+                            <div className="friend-avatar">
+                                {initials(user.name)}
+                            </div>
+                            <div className="friend-info">
+                                <Link
+                                    to={`/profile/${user._id}`}
+                                    className="friend-name-link"
+                                >
+                                    <span className="friend-name">
+                                        {user.name}
+                                    </span>
+                                </Link>
+                                {user.careerGoal && (
+                                    <span className="friend-goal">
+                                        {user.careerGoal}
+                                    </span>
+                                )}
+                            </div>
+                            <button
+                                className="btn-primary"
+                                onClick={() => sendRequest(user._id)}
+                                disabled={sent.includes(user._id)}
+                            >
+                                {sent.includes(user._id) ? "Sent ✓" : "Connect"}
+                            </button>
+                        </div>
+                    ))}
                 </div>
-            ))}
+            )}
         </div>
     );
 }

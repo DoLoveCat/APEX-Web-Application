@@ -1,6 +1,6 @@
 import React from "react";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 const API = "http://localhost:5001/api/chat";
@@ -28,6 +28,8 @@ export default function ChatRoom() {
 
     const [replyingTo, setReplyingTo] = useState(null);
     const [replyText, setReplyText] = useState("");
+
+    const bottomRef = useRef(null);
 
     // --- data loading ---
     const loadMessages = useCallback(async () => {
@@ -86,8 +88,30 @@ export default function ChatRoom() {
         return () => clearInterval(interval);
     }, [loadMessages]);
 
+    // keep the newest message in view
+    useEffect(() => {
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages.length]);
+
     const isMine = (msg) =>
         currentUser && String(msg.userId) === String(currentUser._id);
+
+    function initials(name) {
+        return (name || "?")
+            .trim()
+            .split(/\s+/)
+            .slice(0, 2)
+            .map((part) => part[0]?.toUpperCase() || "")
+            .join("");
+    }
+
+    function formatTime(value) {
+        if (!value) return "";
+        return new Date(value).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit"
+        });
+    }
 
     // --- actions ---
     async function sendMessage(e) {
@@ -170,117 +194,161 @@ export default function ChatRoom() {
     const myName = currentUser?.name;
 
     return (
-        <div>
-            <button className="btn-secondary" onClick={() => navigate("/chat")}>
-                ← Back to rooms
-            </button>
+        <div className="chat">
+            <header className="chat-header">
+                <button
+                    className="chat-back"
+                    onClick={() => navigate("/network")}
+                    aria-label="Back to network"
+                >
+                    ←
+                </button>
+                <div className="chat-avatar">{initials(roomName)}</div>
+                <div className="chat-header-info">
+                    <span className="chat-title">{roomName || `Room ${roomId}`}</span>
+                    {room?.isDirect && <span className="chat-subtitle">Direct message</span>}
+                </div>
+            </header>
 
-            <h2 style={{ marginBottom: 0 }}>{roomName || `Room ${roomId}`}</h2>
-            {!room?.isDirect && (
-                <p className="muted" style={{ marginTop: "4px" }}>Code: {roomId}</p>
-            )}
-
-            {messages.length === 0 ? (
-                <p className="muted">No messages yet. Say hi!</p>
-            ) : (
-                messages.map((msg) => (
-                    <div key={msg._id} className="course-card">
-                        <div style={{ display: "flex", justifyContent: "space-between" }}>
-                            <strong>{msg.username}</strong>
-                            <span className="muted" style={{ fontSize: "0.8rem" }}>
-                                {msg.createdAt && new Date(msg.createdAt).toLocaleString()}
-                            </span>
-                        </div>
-
-                        {editingId === msg._id ? (
-                            <div style={{ margin: "8px 0" }}>
-                                <input
-                                    className="search-input"
-                                    value={editText}
-                                    onChange={(e) => setEditText(e.target.value)}
-                                />
-                                <button className="btn-primary" onClick={() => saveEdit(msg._id)}>
-                                    Save
-                                </button>
-                                <button
-                                    className="btn-secondary"
-                                    onClick={() => {
-                                        setEditingId(null);
-                                        setEditText("");
-                                    }}
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                        ) : (
-                            <p style={{ margin: "8px 0" }}>{msg.text}</p>
-                        )}
-
-                        {/* actions */}
-                        <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
-                            <button onClick={() => vote(msg._id, "thumbsup")}>
-                                👍 {msg.thumbsUp ? msg.thumbsUp.length : 0}
-                                {myName && msg.thumbsUp?.includes(myName) ? " ✓" : ""}
-                            </button>
-                            <button onClick={() => vote(msg._id, "thumbsdown")}>
-                                👎 {msg.thumbsDown ? msg.thumbsDown.length : 0}
-                                {myName && msg.thumbsDown?.includes(myName) ? " ✓" : ""}
-                            </button>
-                            <button
-                                onClick={() =>
-                                    setReplyingTo(replyingTo === msg._id ? null : msg._id)
-                                }
+            <div className="chat-messages">
+                {messages.length === 0 ? (
+                    <p className="chat-empty muted">No messages yet. Say hi! 👋</p>
+                ) : (
+                    messages.map((msg) => {
+                        const mine = isMine(msg);
+                        const liked = myName && msg.thumbsUp?.includes(myName);
+                        const disliked = myName && msg.thumbsDown?.includes(myName);
+                        return (
+                            <div
+                                key={msg._id}
+                                className={`msg-row ${mine ? "mine" : "theirs"}`}
                             >
-                                Reply
-                            </button>
+                                <div className="bubble">
+                                    {!mine && (
+                                        <span className="bubble-sender">{msg.username}</span>
+                                    )}
 
-                            {isMine(msg) && (
-                                <>
-                                    <button onClick={() => startEdit(msg)}>Edit</button>
-                                    <button onClick={() => deleteMessage(msg._id)}>Delete</button>
-                                </>
-                            )}
-                        </div>
+                                    {editingId === msg._id ? (
+                                        <div className="bubble-edit">
+                                            <input
+                                                className="bubble-edit-input"
+                                                value={editText}
+                                                onChange={(e) => setEditText(e.target.value)}
+                                            />
+                                            <div className="bubble-edit-actions">
+                                                <button
+                                                    className="btn-primary"
+                                                    onClick={() => saveEdit(msg._id)}
+                                                >
+                                                    Save
+                                                </button>
+                                                <button
+                                                    className="btn-secondary"
+                                                    onClick={() => {
+                                                        setEditingId(null);
+                                                        setEditText("");
+                                                    }}
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <p className="bubble-text">{msg.text}</p>
+                                    )}
 
-                        {/* replies */}
-                        {msg.replies && msg.replies.length > 0 && (
-                            <div style={{ marginTop: "8px", paddingLeft: "16px", borderLeft: "2px solid #e3e8f2" }}>
-                                {msg.replies.map((reply, i) => (
-                                    <p key={reply._id || i} style={{ margin: "4px 0" }}>
-                                        <strong>{reply.username}:</strong> {reply.text}
-                                    </p>
-                                ))}
+                                    <span className="bubble-time">
+                                        {formatTime(msg.createdAt)}
+                                    </span>
+
+                                    {msg.replies && msg.replies.length > 0 && (
+                                        <div className="bubble-replies">
+                                            {msg.replies.map((reply, i) => (
+                                                <p
+                                                    key={reply._id || i}
+                                                    className="bubble-reply"
+                                                >
+                                                    <strong>{reply.username}:</strong>{" "}
+                                                    {reply.text}
+                                                </p>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="msg-actions">
+                                    <button
+                                        className={`msg-action ${liked ? "active" : ""}`}
+                                        onClick={() => vote(msg._id, "thumbsup")}
+                                    >
+                                        👍 {msg.thumbsUp ? msg.thumbsUp.length : 0}
+                                    </button>
+                                    <button
+                                        className={`msg-action ${disliked ? "active" : ""}`}
+                                        onClick={() => vote(msg._id, "thumbsdown")}
+                                    >
+                                        👎 {msg.thumbsDown ? msg.thumbsDown.length : 0}
+                                    </button>
+                                    <button
+                                        className="msg-action"
+                                        onClick={() =>
+                                            setReplyingTo(
+                                                replyingTo === msg._id ? null : msg._id
+                                            )
+                                        }
+                                    >
+                                        Reply
+                                    </button>
+                                    {mine && (
+                                        <>
+                                            <button
+                                                className="msg-action"
+                                                onClick={() => startEdit(msg)}
+                                            >
+                                                Edit
+                                            </button>
+                                            <button
+                                                className="msg-action"
+                                                onClick={() => deleteMessage(msg._id)}
+                                            >
+                                                Delete
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
+
+                                {replyingTo === msg._id && (
+                                    <div className="reply-box">
+                                        <input
+                                            className="bubble-edit-input"
+                                            placeholder="Write a reply..."
+                                            value={replyText}
+                                            onChange={(e) => setReplyText(e.target.value)}
+                                        />
+                                        <button
+                                            className="btn-primary"
+                                            onClick={() => sendReply(msg._id)}
+                                        >
+                                            Send
+                                        </button>
+                                    </div>
+                                )}
                             </div>
-                        )}
+                        );
+                    })
+                )}
+                <div ref={bottomRef} />
+            </div>
 
-                        {/* reply box */}
-                        {replyingTo === msg._id && (
-                            <div style={{ marginTop: "8px", display: "flex", gap: "8px" }}>
-                                <input
-                                    className="search-input"
-                                    placeholder="Write a reply..."
-                                    value={replyText}
-                                    onChange={(e) => setReplyText(e.target.value)}
-                                />
-                                <button className="btn-primary" onClick={() => sendReply(msg._id)}>
-                                    Send
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                ))
-            )}
-
-            {/* compose new message */}
-            <form className="search-form" onSubmit={sendMessage}>
+            <form className="chat-compose" onSubmit={sendMessage}>
                 <input
-                    className="search-input"
+                    className="chat-input"
                     placeholder="Type a message..."
                     value={newText}
                     onChange={(e) => setNewText(e.target.value)}
                 />
-                <button className="btn-primary" type="submit">
-                    Send
+                <button className="chat-send" type="submit" aria-label="Send">
+                    ➤
                 </button>
             </form>
         </div>

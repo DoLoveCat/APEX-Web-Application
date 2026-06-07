@@ -1,7 +1,29 @@
 // backend/controllers/users.controller.js
 
+const User = require('../models/User');
+
 exports.getMe = async (req, res) => {
   res.json({ user: req.user });
+};
+
+// GET /api/users/:id -> public profile of any user
+exports.getUserById = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select('name careerGoal role friends');
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    res.json({
+      _id: user._id,
+      name: user.name,
+      careerGoal: user.careerGoal,
+      role: user.role,
+      connections: user.friends.length,
+      isFriend: req.user.friends.some((id) => id.toString() === String(user._id))
+    });
+  } catch (error) {
+    console.error('Get user by id error:', error);
+    res.status(500).json({ error: 'Failed to load user' });
+  }
 };
 
 exports.updateMe = async (req, res) => {

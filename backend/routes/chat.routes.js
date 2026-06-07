@@ -9,11 +9,11 @@ router.use(requireAuth);
 // Direct (1-on-1) chat with a friend
 router.post('/direct', chatController.getOrCreateDirectRoom);
 
-// Rooms
-router.get('/rooms', chatController.getRooms);
-router.post('/rooms', chatController.createRoom);
+// My direct conversations (inbox)
+router.get('/conversations', chatController.getMyConversations);
+
+// Room lookup (used to resolve direct-chat titles)
 router.get('/rooms/:roomId', chatController.getRoom);
-router.put('/rooms/:roomId', chatController.renameRoom);
 
 // Messages
 router.get('/rooms/:roomId/messages', chatController.getMessages);

@@ -4,6 +4,7 @@ function cosineSimilarity(a, b) {
     const dot = a.reduce((sum, val, i) => sum + val * b[i], 0);
     const magA = Math.sqrt(a.reduce((sum, val) => sum + val * val, 0));
     const magB = Math.sqrt(b.reduce((sum, val) => sum + val * val, 0));
+    if (magA === 0 || magB === 0) return 0;   // avoid NaN
     return dot / (magA * magB);
 }
 
@@ -38,35 +39,33 @@ async function recommendFriends(req, res) {
         const queryEmbedding = currentUser.careerEmbedding;
         if (!queryEmbedding || queryEmbedding.length === 0) return res.json([]);
 
-        // 2. Get all users with embeddings
-        const users = await User.find({
-            _id: { $ne: userId }, 
-            careerEmbedding: { $exists: true, $ne: [] }
-        }).select("-careerEmbedding -password");
+        // 1. Everyone we should NOT recommend: self, friends, and pending requests
+        const excludeIds = [
+            userId,
+            ...currentUser.friends,
+            ...currentUser.sentRequests,
+            ...currentUser.receivedRequests,
+        ];
 
-        const allUsers = await User.find({
-            _id: { $ne: userId },
-            careerEmbedding: { $exists: true, $ne: [] }
+        // 2. Candidate pool: users with an embedding, not already connected
+        const candidates = await User.find({
+            _id: { $nin: excludeIds },
+            careerEmbedding: { $exists: true, $ne: [] },
         });
 
-        // 3. Score each course
-        const scored = allUsers.map(user => ({
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-            careerGoal: user.careerGoal,
-            score: cosineSimilarity(queryEmbedding, user.careerEmbedding)
-        }));
-
-        // REMOVE EXISTING FRIENDS
-        const friendIds = currentUser.friends.map(f => f.toString());
-        const filtered = scored.filter(u => !friendIds.includes(u._id.toString()));
-        
-        const top = filter
+        // 3. Score by career similarity, sort, take top 3
+        const recommendations = candidates
+            .map(user => ({
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                careerGoal: user.careerGoal,
+                score: cosineSimilarity(queryEmbedding, user.careerEmbedding),
+            }))
             .sort((a, b) => b.score - a.score)
             .slice(0, 3);
 
-        res.json(top);
+        res.json(recommendations);
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: error.message });
@@ -185,10 +184,6 @@ async function acceptFriendRequest(req, res) {
             $push: { friends: userId },
             $pull: { sentRequests: userId }
         });
-
-        console.log("userId:", userId);
-        console.log("requesterId:", requesterId);
-        console.log("receivedRequests:", currentUser.receivedRequests);
 
         res.json({ message: "Friend request accepted" });
 

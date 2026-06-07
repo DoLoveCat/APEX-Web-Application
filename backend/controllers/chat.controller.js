@@ -10,14 +10,37 @@ function generateRoomId() {
   return id;
 }
 
-// GET /api/chat/rooms  -> public group rooms only (direct/1-on-1 rooms hidden)
-exports.getRooms = async (req, res) => {
+// GET /api/chat/conversations  -> my direct chats with the other person + last message
+exports.getMyConversations = async (req, res) => {
   try {
-    const rooms = await Room.find({ isDirect: { $ne: true } }).sort({ createdAt: -1 });
-    res.json(rooms);
+    const rooms = await Room.find({
+      isDirect: true,
+      participants: req.user._id
+    }).populate('participants', 'name');
+
+    const conversations = await Promise.all(
+      rooms.map(async (room) => {
+        const other = room.participants.find(
+          (p) => String(p._id) !== String(req.user._id)
+        );
+        const lastMessage = await Message.findOne({ roomId: room.roomId }).sort({
+          createdAt: -1
+        });
+        return {
+          roomId: room.roomId,
+          name: other?.name || 'Unknown',
+          otherId: other?._id || null,
+          lastText: lastMessage?.text || '',
+          lastAt: lastMessage?.createdAt || room.updatedAt
+        };
+      })
+    );
+
+    conversations.sort((a, b) => new Date(b.lastAt) - new Date(a.lastAt));
+    res.json(conversations);
   } catch (error) {
-    console.error('Get rooms error:', error);
-    res.status(500).json({ error: 'Server error fetching rooms' });
+    console.error('Get conversations error:', error);
+    res.status(500).json({ error: 'Failed to load conversations' });
   }
 };
 
@@ -68,37 +91,6 @@ exports.getOrCreateDirectRoom = async (req, res) => {
   } catch (error) {
     console.error('Get/create direct room error:', error);
     res.status(500).json({ error: 'Server error opening direct chat' });
-  }
-};
-
-// POST /api/chat/rooms
-exports.createRoom = async (req, res) => {
-  try {
-    const room = await Room.create({
-      roomId: generateRoomId(),
-      name: (req.body.name || '').trim(),
-      createdBy: req.user._id
-    });
-    res.status(201).json(room);
-  } catch (error) {
-    console.error('Create room error:', error);
-    res.status(500).json({ error: 'Server error creating room' });
-  }
-};
-
-// PUT /api/chat/rooms/:roomId  -> rename a room
-exports.renameRoom = async (req, res) => {
-  try {
-    const room = await Room.findOneAndUpdate(
-      { roomId: req.params.roomId },
-      { name: (req.body.name || '').trim() },
-      { new: true }
-    );
-    if (!room) return res.status(404).json({ error: 'Room not found' });
-    res.json(room);
-  } catch (error) {
-    console.error('Rename room error:', error);
-    res.status(500).json({ error: 'Server error renaming room' });
   }
 };
 

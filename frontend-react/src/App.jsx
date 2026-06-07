@@ -6,11 +6,15 @@ import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import Browse from "./pages/Browse";
 import MyCourses from "./pages/MyCourses";
-import ChatRooms from "./pages/ChatRooms";
 import ChatRoom from "./pages/ChatRoom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Network from "./pages/Network";
+import Profile from "./pages/Profile";
+import PublicProfile from "./pages/PublicProfile";
+import Messages from "./pages/Messages";
+
+import apexLogo from "./assets/apex_logo.png";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -44,7 +48,13 @@ function App() {
       checkAuth();
   }, []);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading)
+    return (
+      <div className="app-loading">
+        <img src={apexLogo} alt="APEX" className="app-loading-logo" />
+        <div className="spinner" />
+      </div>
+    );
 
   return (
     <Routes>
@@ -55,9 +65,11 @@ function App() {
         <Route index element={<Home user={user}/>} />
         <Route path="browse" element={<Browse/>} />
         <Route path="my-courses" element={<MyCourses/>} />
-        <Route path="chat" element={<ChatRooms/>} />
         <Route path="chat/:roomId" element={<ChatRoom/>} />
+        <Route path="messages" element={<Messages/>} />
         <Route path="network" element={<Network/>} />
+        <Route path="profile" element={<Profile user={user} setUser={setUser}/>} />
+        <Route path="profile/:id" element={<PublicProfile/>} />
       </Route>
     </Routes>
   );

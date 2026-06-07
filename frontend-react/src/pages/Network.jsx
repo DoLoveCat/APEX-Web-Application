@@ -3,6 +3,7 @@ import React from "react";
 import { useEffect, useState } from "react";
 
 import UserList from "../components/UserList";
+import RecommendedFriends from "../components/RecommendedFriends";
 import IncomingRequests from "../components/IncomingRequests";
 import FriendsList from "../components/FriendsList";
 
@@ -44,19 +45,20 @@ export default function Network() {
     }, []);
 
     return (
-        <div>
+        <div className="network-page">
             <h2>Network</h2>
 
             <UserList />
 
-            <br/>
+            <RecommendedFriends />
 
-            <FriendsList friends={friends}/>
+            <FriendsList friends={friends} />
 
-            <br/>
-
-            <IncomingRequests requests={requests} loadRequests={loadRequests} loadFriends={loadFriends}/>
-
+            <IncomingRequests
+                requests={requests}
+                loadRequests={loadRequests}
+                loadFriends={loadFriends}
+            />
         </div>
     );
 }

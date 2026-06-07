@@ -1,5 +1,7 @@
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 
+import { useToast } from "./ToastContext";
+
 const API = "http://localhost:5001/api/users/me/saved-courses";
 const MAX_SAVED = 10;
 
@@ -10,6 +12,7 @@ export function useSavedCourses() {
 }
 
 export function SavedCoursesProvider({ children }) {
+    const toast = useToast();
     // `saved` is an array of full course objects the user has starred
     const [saved, setSaved] = useState([]);
 
@@ -49,7 +52,7 @@ export function SavedCoursesProvider({ children }) {
                     });
                 } else {
                     if (saved.length >= MAX_SAVED) {
-                        alert(`You can only save up to ${MAX_SAVED} courses.`);
+                        toast(`You can only save up to ${MAX_SAVED} courses.`);
                         return;
                     }
                     res = await fetch(API, {
@@ -61,7 +64,7 @@ export function SavedCoursesProvider({ children }) {
 
                 const data = await res.json();
                 if (!res.ok) {
-                    alert(data.error || "Could not update saved courses.");
+                    toast(data.error || "Could not update saved courses.");
                     return;
                 }
                 setSaved(Array.isArray(data) ? data : []);
@@ -69,7 +72,7 @@ export function SavedCoursesProvider({ children }) {
                 console.error("Failed to update saved course:", error);
             }
         },
-        [saved]
+        [saved, toast]
     );
 
     return (
