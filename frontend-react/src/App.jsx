@@ -14,6 +14,10 @@ import Profile from "./pages/Profile";
 import PublicProfile from "./pages/PublicProfile";
 import Messages from "./pages/Messages";
 
+import AdminLayout from "./components/AdminLayout";
+import AdminCourses from "./pages/AdminCourses";
+import AdminUsers from "./pages/AdminUsers";
+
 import apexLogo from "./assets/apex_logo.png";
 
 function App() {
@@ -60,8 +64,23 @@ function App() {
     <Routes>
       <Route path="/login" element={<Login setUser={setUser}/>} />
       <Route path="/register" element={<Register/>} />
+ 
+      {/* ADMIN ROUTES */}
+      <Route path="/admin" element={user?.role === 'admin'
+        ? <AdminLayout user={user} logoutUser={logoutUser}/>
+        : <Navigate to="/login"/>
+      }>
+        <Route index element={<AdminCourses/>} />
+        <Route path="users" element={<AdminUsers/>} />
+      </Route>
 
-      <Route path="/" element={user ? <Layout user={user} logoutUser={logoutUser} /> : <Navigate to="/login" />}>
+      {/* STUDENT ROUTES */}
+      <Route path="/" element={user
+        ? user.role === 'admin'
+          ? <Navigate to="/admin" />
+          : <Layout user={user} logoutUser={logoutUser} />
+        : <Navigate to="/login" />
+      }>
         <Route index element={<Home user={user}/>} />
         <Route path="browse" element={<Browse/>} />
         <Route path="my-courses" element={<MyCourses/>} />
