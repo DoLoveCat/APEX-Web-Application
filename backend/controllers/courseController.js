@@ -36,10 +36,14 @@ async function keywordSearchCourses(req, res) {
 
         if (!q) return res.json([]);
 
+        const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
         const courses = await Course.find({
             $or: [
                 { title: { $regex: q, $options: "i" } },
-                { description: { $regex: q, $options: "i" } }
+                { description: { $regex: q, $options: "i" } },
+                { subject: { $regex: escaped, $options: "i" } },
+                { courseNumber: { $regex: escaped, $options: "i" } }
             ]
         }).select("-embedding -rawDescription");
 
@@ -117,10 +121,77 @@ async function semanticSearch(req, res) {
     }
 }
 
+async function addCourse (req, res) {
+    try {
+        const { subject, courseNumber, title, description, crn } = req.body;
+
+        const combinedText = `${subject} ${courseNumber} ${title} ${description}`;
+        const voyage = getVoyage();
+        
+        const result = await voyage.embed({
+            input: [combinedText],
+            model: "voyage-3"
+        });
+
+        const embedding = result.data[0].embedding;
+
+        const newCourse = await Course.create({
+            subject, courseNumber, title, description, crn, embedding
+        });
+
+        res.json(newCourse);
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: error.message });
+    }
+}
+
+async function editCourse(req, res) {
+    try {
+        const { subject, courseNumber, title, description, crn } = req.body;
+
+        const combinedText = `${subject} ${courseNumber} ${title} ${description}`;
+        const voyage = getVoyage();
+
+        const result = await voyage.embed({
+            input: [combinedText],
+            model: "voyage-3"
+        });
+
+        const embedding = result.data[0].embedding;
+
+        const editedCourse = await Course.findByIdAndUpdate(
+            req.params.id,
+            { subject, courseNumber, title, description, crn, embedding },
+            { new: true }
+        );
+
+        res.json(editedCourse);
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: error.message });
+    }
+}
+
+async function deleteCourse(req, res) {
+    try {
+        await Course.findByIdAndDelete(req.params.id);
+        res.json({ message: "Course deleted" });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: error.message });
+    }
+}
+
 module.exports = {
     getCourses,
     getCourseById,
     keywordSearchCourses,
     semanticSearch,
-    generateEmbedding
+    generateEmbedding,
+    addCourse,
+    editCourse,
+    deleteCourse
 };

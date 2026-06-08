@@ -3,6 +3,7 @@ const cors = require('cors');
 require('dotenv').config();
 const connectDB = require('./config/db');
 const mongoose = require('mongoose');
+const passport = require('./config/passport');
 const authRoutes = require('./routes/auth.routes');
 
 const app = express();
@@ -17,6 +18,10 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
+
+// Passport for Google OAuth. We run it stateless (no sessions) — the
+// Google callback issues a JWT, so passport.initialize() is all we need.
+app.use(passport.initialize());
 
 // Any request that starts with /api/auth/... should go to the auth routes file
 app.use('/api/auth', authRoutes);
@@ -45,4 +50,3 @@ app.get('/health', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-

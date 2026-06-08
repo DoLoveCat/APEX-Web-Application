@@ -1,6 +1,13 @@
-export default function AdminUsers() {
+import { useState, useEffect } from "react";
 
+import UserList from "../components/UserList";
+
+export default function AdminUsers() {
+    
     return (
-        <h1> ADMIN USERS </h1>
-    )
+        <div>
+            <h2>Manage Users</h2>
+            <UserList isAdmin={true} />
+        </div>
+    );
 }

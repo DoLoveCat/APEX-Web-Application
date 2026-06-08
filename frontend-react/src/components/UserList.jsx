@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 import { useToast } from "../context/ToastContext";
 
-const API = "http://localhost:5001/api/friends";
+const FRIENDS_API = "http://localhost:5001/api/friends";
+const USERS_API = "http://localhost:5001/api/users/"; 
 
 function authHeader(json) {
     const headers = {
@@ -22,18 +23,40 @@ function initials(name) {
         .join("");
 }
 
-function UserList() {
+function UserList({ isAdmin }) {
     const toast = useToast();
     const [query, setQuery] = useState("");
     const [results, setResults] = useState([]);
     const [searched, setSearched] = useState(false);
     const [sent, setSent] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    async function loadAllUsers() {
+        setLoading(true);
+        try {
+            const res = await fetch(USERS_API, {
+                headers: authHeader()
+            });
+            const data = await res.json();
+            setResults(Array.isArray(data) ? data : []);
+            setSearched(true);
+        } catch (error) {
+            console.error("Failed to load users:", error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        if (isAdmin) loadAllUsers();
+    }, [isAdmin]);
+
 
     async function search(e) {
         e.preventDefault();
         if (!query.trim()) return;
         try {
-            const res = await fetch(`${API}/search?q=${encodeURIComponent(query.trim())}`, {
+            const res = await fetch(`${FRIENDS_API}/search?q=${encodeURIComponent(query.trim())}`, {
                 headers: authHeader()
             });
             const data = await res.json();
@@ -48,7 +71,7 @@ function UserList() {
 
     async function sendRequest(id) {
         try {
-            const res = await fetch(`${API}/request`, {
+            const res = await fetch(`${FRIENDS_API}/request`, {
                 method: "POST",
                 headers: authHeader(true),
                 body: JSON.stringify({ toUserId: id })
@@ -65,27 +88,60 @@ function UserList() {
         }
     }
 
+    async function deleteUser(id) {
+        try {
+            const res = await fetch(`${USERS_API}/${id}`, {
+                method: "DELETE",
+                headers: authHeader()
+            });
+            const data = await res.json();
+            if (res.ok) {
+                toast("User deleted", "success");
+                loadAllUsers();
+            } else {
+                toast(data.error || "Could not delete user");
+            }
+        } catch (error) {
+            console.error("Failed to delete user:", error);
+        }
+    }
+
+    const displayed = isAdmin
+        ? results.filter((u) => u.name?.toLowerCase().includes(query.toLowerCase()))
+        : results;
+
     return (
         <div>
             <h3>Find People</h3>
 
-            <form className="search-form" onSubmit={search}>
+            {isAdmin ? (
                 <input
                     className="search-input"
-                    placeholder="Search by name..."
+                    placeholder="Filter by name..."
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                 />
-                <button className="btn-primary" type="submit">
-                    Search
-                </button>
-            </form>
+            ) : (
+                <form className="search-form" onSubmit={search}>
+                    <input
+                        className="search-input"
+                        placeholder="Search by name..."
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                    />
+                    <button className="btn-primary" type="submit">
+                        Search
+                    </button>
+                </form>
+            )}
 
-            {searched && results.length === 0 && (
+            {loading && <p>Loading...</p>}
+
+            {searched && displayed.length === 0 && (
                 <p className="muted">No users found.</p>
             )}
 
-            {results.length > 0 && (
+            {displayed.length  > 0 && (
                 <div className="friend-list">
                     {results.map((user) => (
                         <div key={user._id} className="friend-card">
@@ -107,13 +163,23 @@ function UserList() {
                                     </span>
                                 )}
                             </div>
-                            <button
-                                className="btn-primary"
-                                onClick={() => sendRequest(user._id)}
-                                disabled={sent.includes(user._id)}
-                            >
-                                {sent.includes(user._id) ? "Sent ✓" : "Connect"}
-                            </button>
+
+                            {isAdmin ? (
+                                <button
+                                    className="btn-admin-delete"
+                                    onClick={() => deleteUser(user._id)}
+                                >
+                                    Delete
+                                </button>
+                            ) : (
+                                <button
+                                    className="btn-primary"
+                                    onClick={() => sendRequest(user._id)}
+                                    disabled={sent.includes(user._id)}
+                                >
+                                    {sent.includes(user._id) ? "Sent ✓" : "Connect"}
+                                </button>
+                            )}
                         </div>
                     ))}
                 </div>

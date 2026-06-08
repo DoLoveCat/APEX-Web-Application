@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
 import { useToast } from "../context/ToastContext";
@@ -9,6 +9,43 @@ export default function Login({ setUser }) {
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
     const toast = useToast();
+
+    // After Google OAuth, the backend redirects to /login?token=<jwt>.
+    // Pull the token out of the URL, store it, then fetch the user (same
+    // as App.checkAuth) so the password and Google flows end up identical.
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get("token");
+        const error = params.get("error");
+
+        if (error) {
+            toast("Google sign-in failed. Please try again.");
+            window.history.replaceState({}, "", "/login");
+            return;
+        }
+        if (!token) return;
+
+        localStorage.setItem("token", token);
+        // Clean the token out of the URL so it isn't bookmarked or shared.
+        window.history.replaceState({}, "", "/login");
+
+        (async () => {
+            try {
+                const res = await fetch("http://localhost:5001/api/auth/me", {
+                    headers: { Authorization: "Bearer " + token }
+                });
+                if (!res.ok) throw new Error("auth check failed");
+                const data = await res.json();
+                setUser(data.user);
+                navigate("/");
+            } catch (err) {
+                console.error("Google login failed:", err);
+                localStorage.removeItem("token");
+                toast("Could not complete Google sign-in.");
+            }
+        })();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     async function loginUser(e) {
         e.preventDefault();

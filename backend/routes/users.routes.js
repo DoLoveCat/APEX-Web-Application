@@ -19,4 +19,6 @@ router.put('/career-goal', requireAuth, usersController.updateCareerGoal);
 // keep this LAST so it doesn't shadow /me, /me/saved-courses, etc.
 router.get('/:id', requireAuth, usersController.getUserById);
 
+router.delete("/:id", requireAuth, usersController.deleteUser);
+
 module.exports = router;
