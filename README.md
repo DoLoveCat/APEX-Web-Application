@@ -1,7 +1,8 @@
 # APEX-Web-Application
 
+
 <p align="center">
-  <img src="/apex_logo.png" alt="APEX project screenshot" width="50%">
+  <img src="pictures/apex_logo.png" alt="APEX project screenshot" width="50%">
 </p>
 
 - A web app that tailors UCR course recommendations to your career objectives.
@@ -19,17 +20,51 @@
 ## Steps on how to run/ deploy code
 1. Clone the repo
 2. cd into backend folder
-3. Run npm install
-4. Create a .env file with: PORT, MONGO_URI (your Atlas connection string), JWT_SECRET
-5. Run node server.js (or npm start if you have that script)
-6. Open the frontend HTML files with Live Server
-7. Backend runs on localhost:5000 (or whatever port), frontend on Live Server's port
+3. Create a .env file with: based on the .env.example
+4. Run npm install
+5. Run npm start
+6. Open a second terminal
+7. cd into the frontend folder
+8. Run npm install
+9. Run npm start
 
  
 
-## Some Page Layouts 
+## Some Page Layouts
 
-![APEX prject screenshot](frontend/picture/readme_show.png)
+### Login
+Log in with email and password, or continue with Google.
 
-Finish the sort logic in the course page
-![course scrrenshot](frontend/picture/course.png)
+<p align="center">
+  <img src="pictures/login.png" alt="APEX login page" width="85%">
+</p>
+
+### Home — Course Recommendations
+Enter a career goal and get a ranked list of UCR courses to get there.
+
+<p align="center">
+  <img src="pictures/welcome_page.png" alt="Home page with course recommendations" width="85%">
+</p>
+
+### Saved Courses
+Star courses to build your personal plan (save up to 10).
+
+<p align="center">
+  <img src="pictures/stared_course.png" alt="Saved courses page" width="85%">
+</p>
+
+### Network
+Discover people with similar career goals, connect, and manage friend requests.
+
+<p align="center">
+  <img src="pictures/network_page.png" alt="Network page" width="85%">
+</p>
+
+###  Messages
+Chat with your connections in real time.
+
+<p align="center">
+  <img src="pictures/messages_page.png" alt="Messages list" width="85%">
+  <br><br>
+  <img src="pictures/message_with_user.png" alt="Direct message conversation" width="85%">
+</p>
