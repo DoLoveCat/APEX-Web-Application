@@ -10,7 +10,7 @@
 
 
 ## Which tools are used
-- Frontend: Vanilla HTML, CSS, JavaScript (no frameworks)
+- Frontend: React
 - Backend: Node.js, Express.js
 - Database: MongoDB Atlas with Mongoose ODM
 - Authentication: bcrypt for password hashing, JSON Web Tokens (JWT)
