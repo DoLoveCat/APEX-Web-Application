@@ -56,7 +56,7 @@ export default function AdminCourses() {
 
     return (
         <div>
-            <h3>Manage Courses</h3>
+            <h2>Manage Courses</h2>
 
             <CourseForm
                 API_URL={API_URL}

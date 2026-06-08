@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { useToast } from "../context/ToastContext";
 
 const FRIENDS_API = "http://localhost:5001/api/friends";
-const USERS_API = "http://localhost:5001/api/users/"; 
+const USERS_API = "http://localhost:5001/api/users"; 
 
 function authHeader(json) {
     const headers = {
@@ -30,14 +30,16 @@ function UserList({ isAdmin }) {
     const [searched, setSearched] = useState(false);
     const [sent, setSent] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [allUsers, setAllUsers] = useState([]);
 
     async function loadAllUsers() {
         setLoading(true);
         try {
-            const res = await fetch(USERS_API, {
+            const res = await fetch(`${USERS_API}/users`, {
                 headers: authHeader()
             });
             const data = await res.json();
+            setAllUsers(Array.isArray(data) ? data : []);  // store all
             setResults(Array.isArray(data) ? data : []);
             setSearched(true);
         } catch (error) {
@@ -54,6 +56,16 @@ function UserList({ isAdmin }) {
 
     async function search(e) {
         e.preventDefault();
+
+        if (isAdmin) {
+            const filtered = query.trim()
+                ? allUsers.filter((u) => u.name?.toLowerCase().includes(query.toLowerCase()))
+                : allUsers;
+            setResults(filtered);
+            setSearched(true);
+            return;
+        }
+
         if (!query.trim()) return;
         try {
             const res = await fetch(`${FRIENDS_API}/search?q=${encodeURIComponent(query.trim())}`, {
@@ -106,42 +118,29 @@ function UserList({ isAdmin }) {
         }
     }
 
-    const displayed = isAdmin
-        ? results.filter((u) => u.name?.toLowerCase().includes(query.toLowerCase()))
-        : results;
-
     return (
         <div>
             <h3>Find People</h3>
 
-            {isAdmin ? (
+            <form className="search-form" onSubmit={search}>
                 <input
                     className="search-input"
-                    placeholder="Filter by name..."
+                    placeholder="Search by name..."
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                 />
-            ) : (
-                <form className="search-form" onSubmit={search}>
-                    <input
-                        className="search-input"
-                        placeholder="Search by name..."
-                        value={query}
-                        onChange={(e) => setQuery(e.target.value)}
-                    />
-                    <button className="btn-primary" type="submit">
-                        Search
-                    </button>
-                </form>
-            )}
+                <button className="btn-primary" type="submit">
+                    Search
+                </button>
+            </form>
 
             {loading && <p>Loading...</p>}
 
-            {searched && displayed.length === 0 && (
+            {searched && results.length === 0 && (
                 <p className="muted">No users found.</p>
             )}
 
-            {displayed.length  > 0 && (
+            {results.length  > 0 && (
                 <div className="friend-list">
                     {results.map((user) => (
                         <div key={user._id} className="friend-card">

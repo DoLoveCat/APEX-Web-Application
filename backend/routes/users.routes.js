@@ -16,9 +16,11 @@ router.delete('/me/saved-courses/:courseId', requireAuth, usersController.remove
 
 router.put('/career-goal', requireAuth, usersController.updateCareerGoal);
 
+router.get("/users", requireAuth, usersController.getUsers);
+router.delete("/:id", requireAuth, usersController.deleteUser);
+
 // keep this LAST so it doesn't shadow /me, /me/saved-courses, etc.
 router.get('/:id', requireAuth, usersController.getUserById);
 
-router.delete("/:id", requireAuth, usersController.deleteUser);
 
 module.exports = router;

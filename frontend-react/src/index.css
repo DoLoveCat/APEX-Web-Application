@@ -1426,3 +1426,101 @@ a.stat-card:hover {
   font-size: 0.75rem;
   color: #98a2b3;
 }
+
+/* ---- Admin buttons ---- */
+.btn-admin-edit {
+    padding: 8px 14px;
+    background: #fff;
+    color: #3b5bdb;
+    border: 1px solid #3b5bdb;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.btn-admin-edit:hover {
+    background: #3b5bdb;
+    color: #fff;
+}
+
+.btn-admin-delete {
+    padding: 8px 14px;
+    background: #fff;
+    color: #d64545;
+    border: 1px solid #d64545;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.btn-admin-delete:hover {
+    background: #d64545;
+    color: #fff;
+}
+
+/* ---- Admin form ---- */
+.admin-course-form {
+    background: #fff;
+    border: 1px solid #e3e8f2;
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    max-width: 760px;
+    box-shadow: 0 4px 18px rgba(31, 42, 68, 0.08);
+}
+
+.admin-course-form h3 {
+    margin: 0 0 16px;
+    font-size: 1.1rem;
+    color: #1f2a44;
+}
+
+.admin-course-form input,
+.admin-course-form textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #cbd2e0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    font-family: inherit;
+}
+
+.admin-course-form input:focus,
+.admin-course-form textarea:focus {
+    outline: none;
+    border-color: #3b5bdb;
+    box-shadow: 0 0 0 2px rgba(59, 91, 219, 0.15);
+}
+
+.admin-course-form textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.admin-course-form button[type="submit"] {
+    padding: 10px 20px;
+    background: #3b5bdb;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.admin-course-form button[type="submit"]:hover {
+    background: #2f4ac2;
+}
+
+.admin-course-form .error {
+    color: #d64545;
+    font-size: 0.85rem;
+    margin-top: 8px;
+}

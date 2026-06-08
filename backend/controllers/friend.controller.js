@@ -21,7 +21,8 @@ exports.searchUsers = async (req, res) => {
 
     const users = await User.find({
       name: { $regex: q.trim(), $options: 'i' },
-      _id: { $ne: req.user._id }
+      _id: { $ne: req.user._id },
+      role: { $ne: "admin" }
     })
       .select(USER_FIELDS)
       .limit(20);
@@ -157,7 +158,8 @@ exports.getRecommendations = async (req, res) => {
     // Candidate pool: other users who have a career embedding
     const candidates = await User.find({
       _id: { $nin: [...excludeIds] },
-      careerEmbedding: { $exists: true, $ne: [] }
+      careerEmbedding: { $exists: true, $ne: [] },
+      role: { $ne: "admin" }
     }).select('name email careerGoal careerEmbedding');
 
     // Score by career similarity, sort high-to-low, return the top 5

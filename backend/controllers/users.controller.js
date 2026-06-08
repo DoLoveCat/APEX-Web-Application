@@ -140,11 +140,24 @@ exports.deleteUser = async (req, res) => {
           return res.status(403).json({ error: "Cannot delete admin accounts" });
         }
 
-        await Course.findByIdAndDelete(id);
+        await User.findByIdAndDelete(id);
         res.json({ message: "User deleted successfully" });
 
     } catch (error) {
         console.error("Delete user error:", error);
         res.status(500).json({ error: "Failed to delete user" });
+    }
+};
+
+exports.getUsers = async (req, res) => {
+    try {
+        const users = await User.find({ 
+          _id: { $ne: req.user._id },
+          role: { $ne: "admin" }
+        }).select("-password -careerEmbedding");
+        res.json(users);
+    } catch (error) {
+        console.error("Get users error:", error);
+        res.status(500).json({ error: "Failed to load users" });
     }
 };

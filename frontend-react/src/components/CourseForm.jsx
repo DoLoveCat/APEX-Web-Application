@@ -75,66 +75,63 @@ function CourseForm({
     }
 
     return (
-        <form onSubmit={handleSubmit}>
-            
-            <input
-                type="text"
-                name="subject"
-                placeholder="Subject (e.g. CS)"
-                value={formData.subject}
-                onChange={handleChange}
-            />
+        <div className="admin-course-form">
+            <form onSubmit={handleSubmit}>
+                
+                <input
+                    type="text"
+                    name="subject"
+                    placeholder="Subject (e.g. CS)"
+                    value={formData.subject}
+                    onChange={handleChange}
+                />
 
-            <br/>
 
-            <input
-                type="text"
-                name="courseNumber"
-                placeholder="Course Number (e.g. 110)"
-                value={formData.courseNumber}
-                onChange={handleChange}
-            />
+                <input
+                    type="text"
+                    name="courseNumber"
+                    placeholder="Course Number (e.g. 110)"
+                    value={formData.courseNumber}
+                    onChange={handleChange}
+                />
 
-            <br/>
 
-            <input
-                type="text"
-                name="title"
-                placeholder="Title"
-                value={formData.title}
-                onChange={handleChange}
-            />
+                <input
+                    type="text"
+                    name="title"
+                    placeholder="Title"
+                    value={formData.title}
+                    onChange={handleChange}
+                />
 
-            <br/>
 
-            <input
-                type="text"
-                name="crn"
-                placeholder="CRN"
-                value={formData.crn}
-                onChange={handleChange}
-            />
+                <input
+                    type="text"
+                    name="crn"
+                    placeholder="CRN"
+                    value={formData.crn}
+                    onChange={handleChange}
+                />
 
-            <br/>
 
-            <textarea
-                name="description"
-                placeholder="Description"
-                value={formData.description}
-                onChange={handleChange}
-            />
+                <textarea
+                    name="description"
+                    placeholder="Description"
+                    value={formData.description}
+                    onChange={handleChange}
+                />
 
-            <br/>
 
-            <button type="submit">
-                {editingCourse ? "Update Course" : "Add Course"}
-            </button>
+                <button type="submit">
+                    {editingCourse ? "Update Course" : "Add Course"}
+                </button>
 
-            <p className="error">
-                {error === "" ? "" : error}
-            </p>
+                <p className="error">
+                    {error === "" ? "" : error}
+                </p>
 
-        </form>
+            </form>
+        </div>
     )
 }
 
