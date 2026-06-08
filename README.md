@@ -1,7 +1,7 @@
 # APEX-Web-Application
 
 <p align="center">
-  <img src="frontend/picture/apex_logo.png" alt="APEX project screenshot" width="50%">
+  <img src="frontend-react/picture/apex_logo.png" alt="APEX project screenshot" width="50%">
 </p>
 
 - A web app that tailors UCR course recommendations to your career objectives.
