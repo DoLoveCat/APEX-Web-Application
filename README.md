@@ -1,5 +1,6 @@
 # APEX-Web-Application
 
+
 <p align="center">
   <img src="pictures/apex_logo.png" alt="APEX project screenshot" width="50%">
 </p>
