@@ -1,24 +1,69 @@
 # APEX-Web-Application
-A web app that tailors UCR course recommendations to your career objectives.
 
-![APEX prject screenshot](frontend/picture/readme_show.png)
+<p align="center">
+  <img src="/apex_logo.png" alt="APEX project screenshot" width="50%">
+</p>
 
-Finish the sort logic in the course page
-![course scrrenshot](frontend/picture/course.png)
+- A web app that tailors UCR course recommendations to your career objectives.
+- AI-powered career navigation app for UCR students
+- Enter a dream job, get recommended UCR courses and skills to get there, along with a network of relevant people.
 
-# How to Run Current Code
 
-## For Frontend:
-Clone the GitHub repository.
-Open the project folder.
-Open home.html in a browser, or use VS Code Live Server.
-Navigate through Home, Courses, Network, My Path, and Profile pages.
+## Which tools are used
+- Frontend: React
+- Backend: Node.js, Express.js
+- Database: MongoDB Atlas with Mongoose ODM
+- Authentication: bcrypt for password hashing, JSON Web Tokens (JWT)
+- Dev Tools: VS Code, Live Server extension, Thunder Client
 
-## For Backend:
-git pull (from main)
-cd backend && npm install 
-add JWT_SECRET=<anything> to your .env 
-npm run dev — should see "MongoDB connected"
-open signup.html with Live Server to verify auth works locally
+## Steps on how to run/ deploy code
+1. Clone the repo
+2. cd into backend folder
+3. Create a .env file with: based on the .env.example
+4. Run npm install
+5. Run npm start
+6. Open a second terminal
+7. cd into the frontend folder
+8. Run npm install
+9. Run npm start
 
-//////
+ 
+
+## Some Page Layouts
+
+### Login
+Log in with email and password, or continue with Google.
+
+<p align="center">
+  <img src="pictures/login.png" alt="APEX login page" width="85%">
+</p>
+
+### Home — Course Recommendations
+Enter a career goal and get a ranked list of UCR courses to get there.
+
+<p align="center">
+  <img src="pictures/welcome_page.png" alt="Home page with course recommendations" width="85%">
+</p>
+
+### Saved Courses
+Star courses to build your personal plan (save up to 10).
+
+<p align="center">
+  <img src="pictures/stared_course.png" alt="Saved courses page" width="85%">
+</p>
+
+### Network
+Discover people with similar career goals, connect, and manage friend requests.
+
+<p align="center">
+  <img src="pictures/network_page.png" alt="Network page" width="85%">
+</p>
+
+###  Messages
+Chat with your connections in real time.
+
+<p align="center">
+  <img src="pictures/messages_page.png" alt="Messages list" width="85%">
+  <br><br>
+  <img src="pictures/message_with_user.png" alt="Direct message conversation" width="85%">
+</p>
