@@ -17,7 +17,7 @@
 - Save favorite courses
 - Search and add friends
 - See friend recommendations based on similiar career goals
-- Chat woth friends
+- Chat with friends
 - Edit profile
 
 ## Which tools are used
