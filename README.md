@@ -5,10 +5,20 @@
   <img src="pictures/apex_logo.png" alt="APEX project screenshot" width="50%">
 </p>
 
+## Project Overview
 - A web app that tailors UCR course recommendations to your career objectives.
-- AI-powered career navigation app for UCR students
+- AI-powered career navigation app for UCR students.
 - Enter a dream job, get recommended UCR courses and skills to get there, along with a network of relevant people.
 
+## Features
+- Google Authentication
+- Semantic Search for relevant courses to your career
+- Keyword Search all courses at UCR
+- Save favorite courses
+- Search and add friends
+- See friend recommendations based on similiar career goals
+- Chat woth friends
+- Edit profile
 
 ## Which tools are used
 - Frontend: React
@@ -29,7 +39,6 @@
 9. Run npm start
 
  
-
 ## Some Page Layouts
 
 ### Login
@@ -68,3 +77,20 @@ Chat with your connections in real time.
   <br><br>
   <img src="pictures/message_with_user.png" alt="Direct message conversation" width="85%">
 </p>
+
+## Contributions
+- Hooman
+  - Fetching and Embedding Course Database
+  - Implementing semantic search
+  - Admin features and page
+    
+- Rose & Laiba
+  - Networking page 
+  - Frontend side / Project Design 
+  - Register & Login feature
+  - JWT Google authentication 
+  - User profile 
+
+
+## AI Usage
+In general, we tried to keep AI use to a minimum. If you look at our code, you can see that there are a lot of references to the labs we done throughout the quarter. AI was mainly used to explain code for things that were not covered in class, such as scraping and JWT. We also used AI to help with the css.
